@@ -1,0 +1,23 @@
+# Node
+node_modules/
+.env.local
+.env
+.DS_Store
+/dist
+
+# Firebase
+.firebase/
+firestore.indexes.json
+firestore.rules
+firebase-debug.log
+
+# Vite
+.vite/
+
+# IDE
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln

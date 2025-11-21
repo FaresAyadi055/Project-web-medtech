@@ -1,0 +1,32 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    match /users/{userId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null && request.auth.uid == userId;
+    }
+
+    match /tasks/{taskId} {
+      allow read: if request.auth != null;
+      // Only professors (in users collection) can create/update/delete tasks
+      allow create, update, delete: if isProfessor(request.auth.uid);
+    }
+
+    match /comments/{commentId} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null;
+      allow update, delete: if request.auth != null && resource.data.userId == request.auth.uid;
+    }
+
+    match /submissions/{subId} {
+      allow read: if request.auth != null && (isProfessor(request.auth.uid) || resource.data.studentId == request.auth.uid);
+      allow create: if request.auth != null && request.auth.uid == request.resource.data.studentId;
+      allow update: if request.auth != null && (isProfessor(request.auth.uid) || resource.data.studentId == request.auth.uid);
+    }
+
+    function isProfessor(uid){
+      return exists(/databases/$(database)/documents/users/$(uid)) && get(/databases/$(database)/documents/users/$(uid)).data.role == 'professor';
+    }
+  }
+}
