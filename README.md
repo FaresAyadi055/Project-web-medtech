@@ -1,15 +1,12 @@
 # UniTasks — University Task Manager
 
-A production-ready React + Firebase app for university task management with zero uptime cost (uses Firebase free tier).
+Lightweight React app for managing university tasks. This workspace has been converted to run fully locally for UI and functional testing — it stores data in the browser using localStorage.
 
 Features
-- Google and email/password authentication (Firebase Auth)
-- Roles: professor / student stored in `users` collection
-- Tasks (`tasks`), Comments (`comments`), Submissions (`submissions`) in Firestore
-- File uploads stored in Firebase Storage
+- Local mock auth and data stored in localStorage (no remote services required)
+- Roles: professor / student (local-only)
+- Tasks, Comments, Submissions stored locally for quick UI prototyping
 - Dark modern UI built with React + TailwindCSS
-
-Important: This repo is a client-heavy app that uses Firestore and Storage directly from the browser and deploys to Firebase Hosting (free tier). Follow the steps below to configure and deploy.
 
 ## Quickstart (local)
 
@@ -19,20 +16,21 @@ Important: This repo is a client-heavy app that uses Firestore and Storage direc
 npm install
 ```
 
-2. Create a Firebase project at https://console.firebase.google.com/
+2. Local-only setup
 
-3. Enable Authentication
-- Email/Password: enable in Auth > Sign-in methods
-- Google: enable and configure OAuth consent screen
+Copy `.env.example` to `.env.local` and set one of the flags below when developing locally:
 
-4. Enable Firestore (in test or follow the security rules provided)
-5. Enable Firebase Storage
+- VITE_FORCE_MOCK_USER=true — immediately signs in a mock user to inspect the UI
+- VITE_LOCAL_ONLY=true — run the app entirely using the browser's localStorage; no external services
 
-6. Add environment variables (create `.env.local`)
+Local-only mode (no remote services)
+If you'd like to run the app purely locally for UI testing, the project includes a built-in local datastore and mock storage that persist to your browser's localStorage.
 
-Copy `.env.example` to `.env.local` and fill values from Firebase project settings.
+- Set either `VITE_FORCE_MOCK_USER=true` (quick mock authenticated user) or `VITE_LOCAL_ONLY=true` (full local datastore) in `.env.local`. The latter will run the app without calling remote services for reads/writes or storage uploads.
+- Restart the dev server after changing the env file.
+- To reset the local in-browser database, open DevTools → Application → Local Storage and remove the key `uni_tasks_localdb_v1`.
 
-Optional: To test fully offline using the Firebase Emulator Suite, set `VITE_USE_FIREBASE_EMULATOR=true` in `.env.local` and run the emulators locally. Default emulator ports are included in the example file.
+This is useful when you want to iterate on the UI quickly without remote dependencies.
 
 7. Run locally
 
@@ -42,69 +40,41 @@ npm run dev
 
 Open http://localhost:5173
 
-## Deploy to Firebase Hosting
+## Local testing
 
-1. Install Firebase CLI (if not already)
-
-```powershell
-npm install -g firebase-tools
-```
-
-2. Login
+Run the app locally using Vite and use local-only mode to avoid the need for any remote services.
 
 ```powershell
-firebase login
+npm install
+npm run dev
 ```
 
-3. Init hosting in the project folder (select existing project)
+Open http://localhost:5173 to view the app.
 
-```powershell
-firebase init
+## Environment variables (local-only)
+Copy `.env.example` to `.env.local` and configure the `VITE_FORCE_MOCK_USER` or `VITE_LOCAL_ONLY` flags to control local-only behavior.
+
+Seeding local demo data
+
+For local UI testing you can populate the app manually (create a user and tasks via the UI) or use your browser console to write a JSON sample into localStorage under the key `uni_tasks_localdb_v1`.
+
+Example snippet you can run in DevTools → Console to add a sample user and a sample task:
+
+```js
+const db = JSON.parse(localStorage.getItem('uni_tasks_localdb_v1') || '{}')
+db.users = db.users || {}
+db.tasks = db.tasks || {}
+const uid = 'local_user_1'
+db.users[uid] = { id: uid, uid, name: 'Local Student', email: 'student1@test.local', role: 'student', major: 'Computer Science', createdAt: new Date().toISOString() }
+const taskId = 'task_local_1'
+db.tasks[taskId] = { id: taskId, title: 'Local Test Task', description: 'Created in local mode', professorId: null, tags: ['sample'], deadline: new Date(Date.now()+7*24*3600*1000).toISOString(), attachments: [], createdAt: new Date().toISOString() }
+localStorage.setItem('uni_tasks_localdb_v1', JSON.stringify(db))
 ```
 
-- Choose Hosting, Firestore (optional), Storage rules
-- Set build output to `dist`
+Reload the app and sign in (if needed) to see the data.
 
-4. Build and deploy
-
-```powershell
-npm run build
-firebase deploy --only hosting
-```
-
-### CI / GitHub Actions
-
-This repo includes a GitHub Actions workflow at `.github/workflows/firebase-deploy.yml` that builds and deploys the app to Firebase Hosting on `main` branch pushes.
-
-Before using the workflow:
-
-- Set your Firebase project id in `.firebaserc` (replace `your-project-id`).
-- Create a CI token locally and add it to the repository secrets as `FIREBASE_TOKEN`:
-
-```powershell
-# Requires firebase-tools installed locally
-firebase login:ci
-# Copy the printed token and add it to GitHub > Settings > Secrets > Actions > NEW SECRET named FIREBASE_TOKEN
-```
-
-The workflow runs `npm ci`, `npm run build` and then `firebase deploy --only hosting` using the token.
-
-## Environment variables
-Create `.env.local` with these values (example in `.env.example`):
-
-- VITE_FIREBASE_API_KEY
-- VITE_FIREBASE_AUTH_DOMAIN
-- VITE_FIREBASE_PROJECT_ID
-- VITE_FIREBASE_STORAGE_BUCKET
-- VITE_FIREBASE_MESSAGING_SENDER_ID
-- VITE_FIREBASE_APP_ID
-
-## Security / Rules
-Files included:
-- `firebase.firestore.rules` — example Firestore rules
-- `firebase.storage.rules` — example Storage rules
-
-Carefully review and adapt rules before using in production.
+## Security / Data
+This project is now fully local. Data persists to your browser's localStorage under the key `uni_tasks_localdb_v1`. Clear it to reset demo data.
 
 ## Data model overview
 - users: id, name, email, role, major

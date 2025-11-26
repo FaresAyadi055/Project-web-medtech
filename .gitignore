@@ -1,15 +1,16 @@
-# Node
+/node_modules
+/dist
+/secrets
+*.serviceAccount.json
+*.adminsdk.json
+/*.json# Node
 node_modules/
 .env.local
 .env
 .DS_Store
 /dist
 
-# Firebase
-.firebase/
-firestore.indexes.json
-firestore.rules
-firebase-debug.log
+### Removed external-service entries
 
 # Vite
 .vite/

@@ -1,7 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from 'react'
-import { onAuthStateChanged } from 'firebase/auth'
-import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore'
-import { auth, db } from '../firebase'
+import dbClient from './dbClient'
+import dbClient from './dbClient'
 
 const AuthContext = createContext({ user: null, loading: true })
 
@@ -10,37 +9,66 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (fbUser) => {
-      if (!fbUser) {
+    // Development shortcut: allow forcing a mock user for UI inspection.
+    // Set `VITE_FORCE_MOCK_USER=true` in `.env.local` to enable.
+    if (import.meta.env.VITE_FORCE_MOCK_USER === 'true') {
+      const mock = {
+        uid: 'mock-uid-1',
+        email: 'student1@test.local',
+        name: 'Student One',
+        role: 'student',
+        major: 'Computer Science',
+      }
+      setUser(mock)
+      setLoading(false)
+      return () => {}
+    }
+
+    // Load persisted session from localStorage (local-only app)
+    try {
+      const stored = localStorage.getItem('uni_tasks_auth_user')
+      if (stored) {
+        const parsed = JSON.parse(stored)
+        // make sure user doc exists in the local DB
+        dbClient.ensureUserDoc({ uid: parsed.uid || parsed.id, displayName: parsed.name, email: parsed.email }).then(doc => {
+          setUser({ uid: parsed.uid || parsed.id, email: parsed.email, ...doc })
+          setLoading(false)
+        }).catch(() => { setUser(null); setLoading(false) })
+      } else {
         setUser(null)
         setLoading(false)
-        return
       }
-
-      // ensure user doc exists
-      const userRef = doc(db, 'users', fbUser.uid)
-      const snap = await getDoc(userRef)
-      if (!snap.exists()) {
-        await setDoc(userRef, {
-          id: fbUser.uid,
-          name: fbUser.displayName || fbUser.email.split('@')[0],
-          email: fbUser.email,
-          role: 'student',
-          major: '',
-          createdAt: serverTimestamp(),
-        })
-      }
-
-      const userDoc = (await getDoc(userRef)).data()
-      setUser({ uid: fbUser.uid, email: fbUser.email, ...userDoc })
+    } catch (e) {
+      // on error, fallback to anonymous state
+      setUser(null)
       setLoading(false)
-    })
-
-    return unsubscribe
+    }
   }, [])
 
+  const signIn = async (email, password) => {
+    const userDoc = await dbClient.signIn(email, password)
+    setUser({ uid: userDoc.uid || userDoc.id, ...userDoc })
+    try { localStorage.setItem('uni_tasks_auth_user', JSON.stringify({ uid: userDoc.uid || userDoc.id, email: userDoc.email, name: userDoc.name })) } catch (e) {}
+    return userDoc
+  }
+
+  const signUp = async (email, password) => {
+    const userDoc = await dbClient.createUser(email, password, email.split('@')[0])
+    // ensure user exists in local store
+    await dbClient.ensureUserDoc({ uid: userDoc.uid || userDoc.id, displayName: userDoc.name, email: userDoc.email })
+    setUser({ uid: userDoc.uid || userDoc.id, ...userDoc })
+    try { localStorage.setItem('uni_tasks_auth_user', JSON.stringify({ uid: userDoc.uid || userDoc.id, email: userDoc.email, name: userDoc.name })) } catch (e) {}
+    return userDoc
+  }
+
+  const signOutLocal = () => {
+    setUser(null)
+    try { localStorage.removeItem('uni_tasks_auth_user') } catch (e) {}
+    setLoading(false)
+  }
+
   return (
-    <AuthContext.Provider value={{ user, loading, setUser, setLoading }}>
+    <AuthContext.Provider value={{ user, loading, setUser, setLoading, signIn, signUp, signOut: signOutLocal }}>
       {children}
     </AuthContext.Provider>
   )

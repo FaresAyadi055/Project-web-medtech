@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { collection, query, orderBy, getDocs } from 'firebase/firestore'
-import { db } from '../firebase'
+import dbClient from '../lib/dbClient'
 import { useAuth } from '../lib/useAuth'
 import Sidebar from '../components/Sidebar'
 import Topbar from '../components/Topbar'
@@ -14,9 +13,7 @@ export default function Dashboard(){
   const [showEditor, setShowEditor] = useState(false)
 
   useEffect(()=>{
-    const q = query(collection(db, 'tasks'), orderBy('deadline', 'asc'))
-    getDocs(q).then(snap=>{
-      const arr = snap.docs.map(d=>({ id: d.id, ...d.data() }))
+    dbClient.fetchTasks().then(arr=>{
       setTasks(arr)
       setLoading(false)
     })

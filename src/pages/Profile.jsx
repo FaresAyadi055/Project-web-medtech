@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { useAuth } from '../lib/useAuth'
-import { doc, getDoc, setDoc } from 'firebase/firestore'
-import { db } from '../firebase'
+import dbClient from '../lib/dbClient'
 
 export default function Profile(){
   const { user, setUser } = useAuth()
@@ -18,10 +17,8 @@ export default function Profile(){
   },[user])
 
   const save = async ()=>{
-    const ref = doc(db, 'users', user.uid)
-    await setDoc(ref, { ...user, name, major, role }, { merge: true })
-    // update local
-    setUser({ ...user, name, major, role })
+    const saved = await dbClient.saveProfile(user.uid, { ...user, name, major, role })
+    setUser({ ...user, name, major, role, ...saved })
     alert('Saved')
   }
 

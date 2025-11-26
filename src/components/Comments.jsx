@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { collection, query, where, orderBy, getDocs, addDoc, serverTimestamp } from 'firebase/firestore'
-import { db } from '../firebase'
+import dbClient from '../lib/dbClient'
 import { useAuth } from '../lib/useAuth'
 
 export default function Comments({ taskId }){
@@ -9,25 +8,16 @@ export default function Comments({ taskId }){
   const [text, setText] = useState('')
 
   useEffect(()=>{
-    const q = query(collection(db, 'comments'), where('taskId','==',taskId), orderBy('timestamp','asc'))
-    getDocs(q).then(snap=>{
-      setComments(snap.docs.map(d=>({ id: d.id, ...d.data() })))
-    })
+    dbClient.getComments(taskId).then(list=> setComments(list))
   },[taskId])
 
   const handleAdd = async ()=>{
     if(!text.trim()) return
-    await addDoc(collection(db, 'comments'), {
-      taskId,
-      userId: user.uid,
-      text: text.trim(),
-      timestamp: serverTimestamp(),
-    })
+    await dbClient.addComment({ taskId, userId: user.uid, text: text.trim() })
     setText('')
     // reload
-    const q = query(collection(db, 'comments'), where('taskId','==',taskId), orderBy('timestamp','asc'))
-    const snap = await getDocs(q)
-    setComments(snap.docs.map(d=>({ id: d.id, ...d.data() })))
+    const list = await dbClient.getComments(taskId)
+    setComments(list)
   }
 
   return (

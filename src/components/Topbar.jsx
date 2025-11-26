@@ -1,14 +1,21 @@
 import React from 'react'
 import { useAuth } from '../lib/useAuth'
-import { signOut } from 'firebase/auth'
-import { auth } from '../firebase'
 
 export default function Topbar(){
-  const { user } = useAuth()
+  const { user, setUser } = useAuth()
 
-  const handleSignOut = async ()=>{
-    await signOut(auth)
-    window.location.href = '/login'
+  const { signOut } = useAuth()
+
+  const handleSignOut = () => {
+    try {
+      if (typeof signOut === 'function') signOut()
+      else setUser(null)
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.warn('Sign out failed:', e)
+    } finally {
+      window.location.href = '/login'
+    }
   }
 
   return (

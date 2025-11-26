@@ -1,7 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { collection, query, where, getDocs, addDoc, serverTimestamp } from 'firebase/firestore'
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage'
-import { db, storage } from '../firebase'
+import dbClient from '../lib/dbClient'
 import { useAuth } from '../lib/useAuth'
 import { v4 as uuidv4 } from 'uuid'
 
@@ -12,8 +10,7 @@ export default function Submissions({ task }){
   const [uploading, setUploading] = useState(false)
 
   useEffect(()=>{
-    const q = query(collection(db, 'submissions'), where('taskId','==',task.id))
-    getDocs(q).then(snap=> setSubmissions(snap.docs.map(d=>({ id: d.id, ...d.data() }))))
+    dbClient.getSubmissions(task.id).then(list=> setSubmissions(list))
   },[task.id])
 
   const handleFiles = (e)=> setFiles(Array.from(e.target.files))
@@ -22,26 +19,11 @@ export default function Submissions({ task }){
     if(!files.length) return
     setUploading(true)
     try{
-      const uploaded = []
-      for(const f of files){
-        const r = ref(storage, `submissions/${uuidv4()}_${f.name}`)
-        const s = await uploadBytes(r, f)
-        const url = await getDownloadURL(s.ref)
-        uploaded.push({ name: f.name, url })
-      }
-
-      await addDoc(collection(db, 'submissions'), {
-        taskId: task.id,
-        studentId: user.uid,
-        files: uploaded,
-        status: 'submitted',
-        createdAt: serverTimestamp(),
-      })
+      await dbClient.addSubmission({ taskId: task.id, studentId: user.uid, status: 'submitted' }, files)
 
       // reload
-      const q = query(collection(db, 'submissions'), where('taskId','==',task.id))
-      const snap = await getDocs(q)
-      setSubmissions(snap.docs.map(d=>({ id: d.id, ...d.data() })))
+      const list = await dbClient.getSubmissions(task.id)
+      setSubmissions(list)
       setFiles([])
     }catch(err){
       console.error(err)

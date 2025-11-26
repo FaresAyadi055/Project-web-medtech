@@ -1,7 +1,6 @@
 import React, { useState } from 'react'
-import { signInWithEmailAndPassword, createUserWithEmailAndPassword, signInWithPopup } from 'firebase/auth'
-import { auth, googleProvider, db } from '../firebase'
-import { doc, setDoc, serverTimestamp } from 'firebase/firestore'
+import dbClient from '../lib/dbClient'
+import { useAuth } from '../lib/useAuth'
 import { useNavigate } from 'react-router-dom'
 
 export default function Login() {
@@ -10,42 +9,17 @@ export default function Login() {
   const [mode, setMode] = useState('login')
   const navigate = useNavigate()
 
-  const handleGoogle = async () => {
-    try {
-      const result = await signInWithPopup(auth, googleProvider)
-      const fbUser = result.user
-      // ensure user doc exists
-      await setDoc(doc(db, 'users', fbUser.uid), {
-        id: fbUser.uid,
-        name: fbUser.displayName || fbUser.email.split('@')[0],
-        email: fbUser.email,
-        role: 'student',
-        major: '',
-        createdAt: serverTimestamp(),
-      }, { merge: true })
-      navigate('/')
-    } catch (err) {
-      console.error(err)
-      alert(err.message)
-    }
-  }
+  const { signIn, signUp } = useAuth()
 
   const handleSubmit = async (e) => {
     e.preventDefault()
     try {
       if (mode === 'signup') {
-        const res = await createUserWithEmailAndPassword(auth, email, password)
-        const fbUser = res.user
-        await setDoc(doc(db, 'users', fbUser.uid), {
-          id: fbUser.uid,
-          name: email.split('@')[0],
-          email,
-          role: 'student',
-          major: '',
-          createdAt: serverTimestamp(),
-        })
+        const newUser = await signUp(email, password)
+        // ensure profile is saved
+        await dbClient.saveProfile(newUser.uid || newUser.id, { id: newUser.uid || newUser.id, name: email.split('@')[0], email, role: 'student', major: '' })
       } else {
-        await signInWithEmailAndPassword(auth, email, password)
+        await signIn(email, password)
       }
       navigate('/')
     } catch (err) {
@@ -58,9 +32,7 @@ export default function Login() {
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-black to-gray-900">
       <div className="w-full max-w-md p-8 rounded-lg card">
         <h1 className="text-2xl font-semibold mb-4">UniTasks</h1>
-        <p className="text-sm text-slate-400 mb-6">University task management — Sign in with Google or email</p>
-
-        <button onClick={handleGoogle} className="w-full mb-4 py-2 rounded bg-slate-800 hover:bg-slate-700">Sign in with Google</button>
+        <p className="text-sm text-slate-400 mb-6">University task management — Sign in with email (local-only mode)</p>
 
         <form onSubmit={handleSubmit} className="space-y-3">
           <input required value={email} onChange={(e)=>setEmail(e.target.value)} placeholder="Email" className="w-full p-2 rounded bg-gray-800" />

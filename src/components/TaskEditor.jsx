@@ -1,7 +1,5 @@
 import React, { useState } from 'react'
-import { collection, addDoc, serverTimestamp } from 'firebase/firestore'
-import { db, storage } from '../firebase'
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage'
+import dbClient from '../lib/dbClient'
 import { useAuth } from '../lib/useAuth'
 import { v4 as uuidv4 } from 'uuid'
 
@@ -20,22 +18,15 @@ export default function TaskEditor({ onClose }){
     e.preventDefault()
     setSaving(true)
     try{
-      const attachments = []
-      for(const f of files){
-        const storageRef = ref(storage, `task_attachments/${uuidv4()}_${f.name}`)
-        const snap = await uploadBytes(storageRef, f)
-        const url = await getDownloadURL(snap.ref)
-        attachments.push({ name: f.name, url })
-      }
+      const attachments = await dbClient.uploadFiles(files)
 
-      await addDoc(collection(db, 'tasks'), {
+      await dbClient.createTask({
         title,
         description,
         professorId: user.uid,
         tags: tags.split(',').map(t=>t.trim()).filter(Boolean),
         deadline: deadline ? new Date(deadline) : null,
         attachments,
-        createdAt: serverTimestamp(),
       })
 
       onClose && onClose()

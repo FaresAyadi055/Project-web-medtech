@@ -16,7 +16,7 @@ export default function Sidebar(){
         <NavLink to="/profile" className={({isActive})=>`block p-2 rounded ${isActive? 'bg-gray-800':'hover:bg-gray-900'}`}>Profile</NavLink>
       </nav>
 
-      <div className="mt-6 text-xs text-slate-500">Dark theme • Firebase backend</div>
+      <div className="mt-6 text-xs text-slate-500">Dark theme • Local datastore (localStorage)</div>
     </aside>
   )
 }

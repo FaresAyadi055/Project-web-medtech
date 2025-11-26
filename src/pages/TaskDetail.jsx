@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
-import { doc, getDoc } from 'firebase/firestore'
-import { db } from '../firebase'
+import dbClient from '../lib/dbClient'
 import Sidebar from '../components/Sidebar'
 import Topbar from '../components/Topbar'
 import Comments from '../components/Comments'
@@ -13,13 +12,8 @@ export default function TaskDetail(){
   const [loading, setLoading] = useState(true)
 
   useEffect(()=>{
-    const d = doc(db, 'tasks', id)
-    getDoc(d).then(snap=>{
-      if(!snap.exists()){
-        setTask(null)
-      } else {
-        setTask({ id: snap.id, ...snap.data() })
-      }
+    dbClient.fetchTaskById(id).then(t=>{
+      setTask(t)
       setLoading(false)
     })
   },[id])
