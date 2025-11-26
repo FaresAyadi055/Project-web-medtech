@@ -3,9 +3,12 @@ import { useNavigate, Link } from 'react-router-dom'
 import { useAuth } from '../lib/useAuth'
 import api from '../api/client'
 
-export default function Login() {
+export default function Register() {
+  const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
+  const [role, setRole] = useState('student')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const navigate = useNavigate()
@@ -14,10 +17,20 @@ export default function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault()
     setError('')
-    setLoading(true)
 
+    if (password !== confirmPassword) {
+      setError('Passwords do not match')
+      return
+    }
+
+    if (password.length < 6) {
+      setError('Password must be at least 6 characters')
+      return
+    }
+
+    setLoading(true)
     try {
-      const resp = await api.post('/auth/login', { email, password })
+      const resp = await api.post('/auth/register', { name, email, password, role })
       if (resp.data?.token) {
         localStorage.setItem('uni_tasks_token', resp.data.token)
         localStorage.setItem('uni_tasks_auth_user', JSON.stringify({ 
@@ -30,8 +43,7 @@ export default function Login() {
         navigate('/')
       }
     } catch (err) {
-      setError(err.response?.data?.message || 'Login failed')
-      console.error('Login error:', err)
+      setError(err.response?.data?.message || 'Registration failed')
     } finally {
       setLoading(false)
     }
@@ -40,8 +52,8 @@ export default function Login() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-black to-gray-900">
       <div className="w-full max-w-md p-8 rounded-lg card">
-        <h1 className="text-3xl font-bold mb-2">UniTasks</h1>
-        <p className="text-sm text-slate-400 mb-6">School task management system</p>
+        <h1 className="text-3xl font-bold mb-2">Create Account</h1>
+        <p className="text-sm text-slate-400 mb-6">Join UniTasks to manage school assignments</p>
 
         {error && (
           <div className="mb-4 p-3 bg-red-900 bg-opacity-20 border border-red-700 rounded text-red-300 text-sm">
@@ -50,6 +62,17 @@ export default function Login() {
         )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium mb-1">Full Name</label>
+            <input
+              required
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="Your name"
+              className="w-full p-2 rounded bg-gray-800 border border-gray-700 focus:border-indigo-500 focus:outline-none"
+            />
+          </div>
+
           <div>
             <label className="block text-sm font-medium mb-1">Email</label>
             <input
@@ -60,6 +83,19 @@ export default function Login() {
               placeholder="your@email.com"
               className="w-full p-2 rounded bg-gray-800 border border-gray-700 focus:border-indigo-500 focus:outline-none"
             />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium mb-1">Role</label>
+            <select
+              value={role}
+              onChange={(e) => setRole(e.target.value)}
+              className="w-full p-2 rounded bg-gray-800 border border-gray-700 focus:border-indigo-500 focus:outline-none"
+            >
+              <option value="student">Student</option>
+              <option value="teacher">Teacher</option>
+            </select>
+            <p className="text-xs text-slate-400 mt-1">Contact admin for admin account</p>
           </div>
 
           <div>
@@ -74,29 +110,32 @@ export default function Login() {
             />
           </div>
 
+          <div>
+            <label className="block text-sm font-medium mb-1">Confirm Password</label>
+            <input
+              required
+              type="password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              placeholder="Confirm Password"
+              className="w-full p-2 rounded bg-gray-800 border border-gray-700 focus:border-indigo-500 focus:outline-none"
+            />
+          </div>
+
           <button
             type="submit"
             disabled={loading}
             className="w-full py-2 rounded bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 font-medium"
           >
-            {loading ? 'Signing in...' : 'Sign In'}
+            {loading ? 'Creating account...' : 'Create Account'}
           </button>
         </form>
 
         <div className="mt-6 text-center text-sm text-slate-400">
-          Don't have an account?{' '}
-          <Link to="/register" className="text-indigo-400 hover:text-indigo-300">
-            Create one
+          Already have an account?{' '}
+          <Link to="/login" className="text-indigo-400 hover:text-indigo-300">
+            Sign in
           </Link>
-        </div>
-
-        <div className="mt-6 pt-6 border-t border-gray-800">
-          <p className="text-xs text-slate-500 mb-2">Demo Credentials:</p>
-          <div className="space-y-1 text-xs text-slate-400">
-            <p>Admin: admin@local / password123</p>
-            <p>Teacher: alice@local / password123</p>
-            <p>Student: bob@local / password123</p>
-          </div>
         </div>
       </div>
     </div>

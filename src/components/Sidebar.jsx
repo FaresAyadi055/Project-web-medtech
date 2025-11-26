@@ -1,22 +1,63 @@
 import React from 'react'
 import { NavLink } from 'react-router-dom'
+import { useAuth } from '../lib/useAuth'
 
 export default function Sidebar(){
+  const { user } = useAuth()
+
   return (
-    <aside className="w-64 p-4 border-r border-gray-800 min-h-screen bg-black">
+    <aside className="w-64 p-4 border-r border-gray-800 min-h-screen bg-black sticky top-0">
       <div className="mb-6">
         <h1 className="text-2xl font-bold">UniTasks</h1>
-        <p className="text-sm text-slate-400">University task manager</p>
+        <p className="text-sm text-slate-400">Task Management</p>
       </div>
 
+      {user && (
+        <div className="mb-6 pb-6 border-b border-gray-800">
+          <div className="text-sm">
+            <p className="text-slate-400 text-xs">Signed in as</p>
+            <p className="font-medium">{user.name}</p>
+            <p className="text-xs text-slate-400 capitalize">{user.role}</p>
+          </div>
+        </div>
+      )}
+
       <nav className="space-y-2">
-        <NavLink to="/" end className={({isActive})=>`block p-2 rounded ${isActive? 'bg-gray-800':'hover:bg-gray-900'}`} >Tasks</NavLink>
-        <NavLink to="/forum" className={({isActive})=>`block p-2 rounded ${isActive? 'bg-gray-800':'hover:bg-gray-900'}`}>Forum</NavLink>
-        <NavLink to="/submissions" className={({isActive})=>`block p-2 rounded ${isActive? 'bg-gray-800':'hover:bg-gray-900'}`}>My Submissions</NavLink>
-        <NavLink to="/profile" className={({isActive})=>`block p-2 rounded ${isActive? 'bg-gray-800':'hover:bg-gray-900'}`}>Profile</NavLink>
+        <NavLink to="/" end className={({isActive})=>`block p-2 rounded ${isActive? 'bg-gray-800':'hover:bg-gray-900'}`}>
+          Dashboard
+        </NavLink>
+
+        {user?.role === 'admin' && (
+          <>
+            <NavLink to="/admin/users" className={({isActive})=>`block p-2 rounded ${isActive? 'bg-gray-800':'hover:bg-gray-900'}`}>
+              Manage Users
+            </NavLink>
+            <NavLink to="/admin/classes" className={({isActive})=>`block p-2 rounded ${isActive? 'bg-gray-800':'hover:bg-gray-900'}`}>
+              Manage Classes
+            </NavLink>
+          </>
+        )}
+
+        {user?.role === 'teacher' && (
+          <>
+            <NavLink to="/teacher/classes" className={({isActive})=>`block p-2 rounded ${isActive? 'bg-gray-800':'hover:bg-gray-900'}`}>
+              My Classes
+            </NavLink>
+            <NavLink to="/teacher/tasks" className={({isActive})=>`block p-2 rounded ${isActive? 'bg-gray-800':'hover:bg-gray-900'}`}>
+              Manage Tasks
+            </NavLink>
+          </>
+        )}
+
+        <NavLink to="/profile" className={({isActive})=>`block p-2 rounded ${isActive? 'bg-gray-800':'hover:bg-gray-900'}`}>
+          My Profile
+        </NavLink>
       </nav>
 
-      <div className="mt-6 text-xs text-slate-500">Dark theme • Local datastore (localStorage)</div>
+      <div className="mt-6 text-xs text-slate-500">
+        <p>Version 1.0</p>
+        <p>School Task Manager</p>
+      </div>
     </aside>
   )
 }
