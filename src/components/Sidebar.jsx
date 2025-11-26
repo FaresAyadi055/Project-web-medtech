@@ -14,10 +14,19 @@ export default function Sidebar(){
 
       {user && (
         <div className="mb-6 pb-6 border-b border-gray-800">
-          <div className="text-sm">
-            <p className="text-slate-400 text-xs">Signed in as</p>
-            <p className="font-medium">{user.name}</p>
-            <p className="text-xs text-slate-400 capitalize">{user.role}</p>
+          <div className="flex items-center gap-3">
+            <div className="w-12 h-12 rounded-full overflow-hidden bg-slate-700">
+              {user.profilePicture ? (
+                <img src={user.profilePicture} alt={user.name} className="w-full h-full object-cover" />
+              ) : (
+                <div className="flex items-center justify-center h-full text-xs text-slate-300">{user.name?.[0]}</div>
+              )}
+            </div>
+            <div className="text-sm">
+              <p className="text-slate-400 text-xs">Signed in as</p>
+              <p className="font-medium">{user.name}</p>
+              <p className="text-xs text-slate-400 capitalize">{user.role}</p>
+            </div>
           </div>
         </div>
       )}

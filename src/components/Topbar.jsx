@@ -1,5 +1,6 @@
 import React from 'react'
 import { useAuth } from '../lib/useAuth'
+import FooterLogo from './FooterLogo'
 
 export default function Topbar(){
   const { user, setUser } = useAuth()
@@ -25,6 +26,7 @@ export default function Topbar(){
         <div className="text-sm text-slate-300">{user?.name || user?.email}</div>
         <button onClick={handleSignOut} className="py-1 px-3 bg-gray-800 rounded">Sign out</button>
       </div>
+      <FooterLogo />
     </div>
   )
 }

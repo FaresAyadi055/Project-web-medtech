@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { useAuth } from '../lib/useAuth'
 import api from '../api/client'
+import Logo from '../assets/logo.svg'
 
 export default function Register() {
   const [name, setName] = useState('')
@@ -11,6 +12,7 @@ export default function Register() {
   const [role, setRole] = useState('student')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  const [profileFile, setProfileFile] = useState(null)
   const navigate = useNavigate()
   const { setUser, setLoading: setAuthLoading } = useAuth()
 
@@ -30,7 +32,13 @@ export default function Register() {
 
     setLoading(true)
     try {
-      const resp = await api.post('/auth/register', { name, email, password, role })
+      const form = new FormData()
+      form.append('name', name)
+      form.append('email', email)
+      form.append('password', password)
+      form.append('role', role)
+      if (profileFile) form.append('profilePicture', profileFile)
+      const resp = await api.post('/auth/register', form, { headers: { 'Content-Type': 'multipart/form-data' } })
       if (resp.data?.token) {
         localStorage.setItem('uni_tasks_token', resp.data.token)
         localStorage.setItem('uni_tasks_auth_user', JSON.stringify({ 
@@ -52,8 +60,13 @@ export default function Register() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-black to-gray-900">
       <div className="w-full max-w-md p-8 rounded-lg card">
-        <h1 className="text-3xl font-bold mb-2">Create Account</h1>
-        <p className="text-sm text-slate-400 mb-6">Join UniTasks to manage school assignments</p>
+        <div className="flex items-center gap-4 mb-4">
+          <img src={Logo} alt="UniTasks" className="w-12 h-12" />
+          <div>
+            <h1 className="text-2xl font-bold mb-0">Create Account</h1>
+            <p className="text-xs text-slate-400">Join UniTasks to manage school assignments</p>
+          </div>
+        </div>
 
         {error && (
           <div className="mb-4 p-3 bg-red-900 bg-opacity-20 border border-red-700 rounded text-red-300 text-sm">
@@ -122,6 +135,10 @@ export default function Register() {
             />
           </div>
 
+          <div>
+            <label className="text-sm text-slate-400">Profile Picture (optional)</label>
+            <input type="file" onChange={(e)=>setProfileFile(e.target.files[0])} className="mt-2" />
+          </div>
           <button
             type="submit"
             disabled={loading}

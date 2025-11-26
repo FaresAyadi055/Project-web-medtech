@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { useAuth } from '../lib/useAuth'
 import api from '../api/client'
+import Logo from '../assets/logo.svg'
 
 export default function Login() {
   const [email, setEmail] = useState('')
@@ -40,7 +41,13 @@ export default function Login() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-black to-gray-900">
       <div className="w-full max-w-md p-8 rounded-lg card">
-        <h1 className="text-3xl font-bold mb-2">UniTasks</h1>
+        <div className="flex items-center gap-4 mb-4">
+          <img src={Logo} alt="UniTasks" className="w-12 h-12" />
+          <div>
+            <h1 className="text-3xl font-bold mb-0">UniTasks</h1>
+            <p className="text-xs text-slate-400">School task management</p>
+          </div>
+        </div>
         <p className="text-sm text-slate-400 mb-6">School task management system</p>
 
         {error && (

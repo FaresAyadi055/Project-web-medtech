@@ -23,6 +23,16 @@ async function fetchTasks() {
 
 async function createTask(payload) {
   if (isLocal) return localDb.createTask(payload)
+  // support file attachments when provided
+  if (payload.attachments && payload.attachments.length > 0) {
+    const form = new FormData()
+    form.append('title', payload.title)
+    form.append('description', payload.description || '')
+    if (payload.class) form.append('classId', payload.class)
+    for (const f of payload.attachments) form.append('attachments', f)
+    const resp = await api.post('/tasks', form, { headers: { 'Content-Type': 'multipart/form-data' } })
+    return resp.data
+  }
   const resp = await api.post('/tasks', { title: payload.title, description: payload.description, classId: payload.class })
   return resp.data
 }
@@ -41,7 +51,7 @@ async function getComments(taskId) {
 
 async function addComment(payload) {
   if (isLocal) return localDb.addComment(payload)
-  const resp = await api.post('/comments', payload)
+  const resp = await api.post(`/tasks/${payload.taskId}/comments`, { content: payload.content })
   return resp.data
 }
 
@@ -56,16 +66,20 @@ async function addSubmission(payload, files = []) {
     const uploaded = await localDb.uploadFiles(files)
     return localDb.addSubmission({ ...payload, files: uploaded })
   }
-
-  // For now send content and ignore file uploads (could be extended to multipart)
-  const resp = await api.post('/submissions', { taskId: payload.taskId, content: payload.content })
+  const form = new FormData()
+  form.append('taskId', payload.taskId)
+  form.append('content', payload.content || '')
+  for (const f of files) form.append('attachments', f)
+  const resp = await api.post('/submissions', form, { headers: { 'Content-Type': 'multipart/form-data' } })
   return resp.data
 }
 
 async function uploadFiles(files) {
   if (isLocal) return localDb.uploadFiles(files)
-  // file upload not implemented in API; fall back to local simulation
-  return localDb.uploadFiles(files)
+  const form = new FormData()
+  for (const f of files) form.append('files', f)
+  const resp = await api.post('/uploads', form, { headers: { 'Content-Type': 'multipart/form-data' } })
+  return resp.data.urls
 }
 
 async function saveProfile(uid, patch) {

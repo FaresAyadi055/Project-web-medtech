@@ -20,8 +20,17 @@ const seed = async () => {
 
   const hash = await bcrypt.hash('password123', 10)
   const admin = await User.create({ name: 'Admin User', email: 'admin@local', password: hash, role: 'admin' })
+  const admin2 = await User.create({ name: 'Admin User 2', email: 'admin2@local', password: hash, role: 'admin' })
   const teacher = await User.create({ name: 'Prof Alice', email: 'alice@local', password: hash, role: 'teacher' })
+  const professors = []
+  for(let i=1; i<=5; i++){
+    professors.push(await User.create({ name: `Prof ${i}`, email: `prof${i}@local`, password: hash, role: 'teacher' }))
+  }
   const student = await User.create({ name: 'Student Bob', email: 'bob@local', password: hash, role: 'student' })
+  const students = []
+  for(let i=1; i<=10; i++){
+    students.push(await User.create({ name: `Student ${i}`, email: `student${i}@local`, password: hash, role: 'student' }))
+  }
 
   const klass = await ClassModel.create({ name: 'CS101', teacher: teacher._id, students: [student._id] })
 
@@ -34,7 +43,25 @@ const seed = async () => {
   klass.tasks.push(task._id)
   await klass.save()
 
-  await Submission.create({ task: task._id, student: student._id, content: 'My solution', status: 'pending' })
+  const submission = await Submission.create({ 
+    task: task._id, 
+    student: student._id, 
+    content: 'My solution', 
+    status: 'pending',
+    submittedAt: new Date()
+  })
+  
+  const unsubmittedTask = await Task.create({ title: 'Advanced Assignment', description: 'Complex problem', class: klass._id, createdBy: teacher._id })
+  klass.tasks.push(unsubmittedTask._id)
+  await klass.save()
+  
+  await Submission.create({ 
+    task: unsubmittedTask._id, 
+    student: student._id, 
+    content: null,
+    status: 'pending',
+    submittedAt: null
+  })
 
   console.log('Seed complete: admin@local / alice@local / bob@local (all password: password123)')
   process.exit(0)

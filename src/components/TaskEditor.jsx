@@ -18,15 +18,13 @@ export default function TaskEditor({ onClose }){
     e.preventDefault()
     setSaving(true)
     try{
-      const attachments = await dbClient.uploadFiles(files)
-
       await dbClient.createTask({
         title,
         description,
         professorId: user.uid,
         tags: tags.split(',').map(t=>t.trim()).filter(Boolean),
         deadline: deadline ? new Date(deadline) : null,
-        attachments,
+        attachments: files,
       })
 
       onClose && onClose()

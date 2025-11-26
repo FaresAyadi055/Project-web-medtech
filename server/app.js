@@ -8,6 +8,8 @@ import userRoutes from './routes/users.js'
 import classRoutes from './routes/classes.js'
 import taskRoutes from './routes/tasks.js'
 import submissionRoutes from './routes/submissions.js'
+import uploadRoutes from './routes/uploads.js'
+import path from 'path'
 
 dotenv.config()
 
@@ -27,6 +29,9 @@ const corsOptions = {
 app.use(cors(corsOptions))
 app.use(express.json({ limit: '5mb' }))
 
+// Serve uploaded files
+app.use('/uploads', express.static(path.join(process.cwd(), 'server', 'uploads')))
+
 // Request logging
 app.use((req, res, next) => {
   console.log(`${req.method} ${req.path}`)
@@ -41,6 +46,7 @@ app.use('/api/users', userRoutes)
 app.use('/api/classes', classRoutes)
 app.use('/api/tasks', taskRoutes)
 app.use('/api/submissions', submissionRoutes)
+app.use('/api/uploads', uploadRoutes)
 
 // 404 handler
 app.use('*', (req, res) => {

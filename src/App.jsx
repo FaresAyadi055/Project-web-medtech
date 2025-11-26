@@ -3,6 +3,7 @@ import { Routes, Route, Navigate } from 'react-router-dom'
 import Login from './pages/Login'
 import Register from './pages/Register'
 import AdminDashboard from './pages/AdminDashboard'
+import ManageUsers from './pages/ManageUsers'
 import TeacherDashboard from './pages/TeacherDashboard'
 import StudentDashboard from './pages/StudentDashboard'
 import TaskDetail from './pages/TaskDetail'
@@ -40,7 +41,7 @@ export default function App() {
         </ProtectedRoute>
       } />
       
-      <Route path="/admin/users" element={<ProtectedRoute requiredRoles={['admin']}><AdminDashboard /></ProtectedRoute>} />
+      <Route path="/admin/users" element={<ProtectedRoute requiredRoles={['admin']}><ManageUsers /></ProtectedRoute>} />
       <Route path="/admin/classes" element={<ProtectedRoute requiredRoles={['admin']}><ClassManagement /></ProtectedRoute>} />
       
       <Route path="/teacher/classes" element={<ProtectedRoute requiredRoles={['teacher']}><ClassManagement /></ProtectedRoute>} />

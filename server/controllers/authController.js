@@ -13,10 +13,11 @@ export async function register(req, res) {
     const existing = await User.findOne({ email })
     if (existing) return res.status(409).json({ message: 'Email already in use' })
     const hashed = await bcrypt.hash(password, 10)
-    const user = new User({ name, email, password: hashed, role: role || 'student' })
+    const profilePicture = req.file ? `/uploads/${req.file.filename}` : undefined
+    const user = new User({ name, email, password: hashed, role: role || 'student', profilePicture })
     await user.save()
     const token = generateToken(user)
-    res.json({ user: { id: user._id, name: user.name, email: user.email, role: user.role }, token })
+    res.json({ user: { id: user._id, name: user.name, email: user.email, role: user.role, profilePicture: user.profilePicture }, token })
   } catch (err) {
     res.status(500).json({ message: err.message })
   }

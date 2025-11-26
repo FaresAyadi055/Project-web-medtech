@@ -7,7 +7,7 @@ const router = express.Router()
 router.use(requireAuth)
 // Admin routes
 router.post('/', requireRole('admin'), createClass)
-router.get('/', requireRole('admin','teacher'), listClasses)
+router.get('/', requireRole('admin','teacher','student'), listClasses)
 router.get('/:id', requireRole('admin','teacher'), getClass)
 router.post('/:id/enroll', requireRole('teacher','admin'), enrollStudent)
 router.post('/:id/remove-student', requireRole('teacher','admin'), removeStudent)
