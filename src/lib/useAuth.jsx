@@ -1,6 +1,5 @@
 import React, { createContext, useContext, useEffect, useState } from 'react'
 import dbClient from './dbClient'
-import dbClient from './dbClient'
 
 const AuthContext = createContext({ user: null, loading: true })
 
