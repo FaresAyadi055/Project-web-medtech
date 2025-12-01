@@ -5,6 +5,7 @@ import Sidebar from '../components/Sidebar'
 import Topbar from '../components/Topbar'
 import api from '../api/client'
 
+
 ChartJS.register(ArcElement, Tooltip, Legend)
 
 export default function AdminDashboard() {

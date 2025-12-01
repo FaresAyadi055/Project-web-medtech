@@ -1,6 +1,7 @@
 import React from 'react'
 import { useAuth } from '../lib/useAuth'
 import FooterLogo from './FooterLogo'
+import BackButton from '../components/BackButton'
 
 export default function Topbar(){
   const { user, setUser } = useAuth()
@@ -21,6 +22,7 @@ export default function Topbar(){
 
   return (
     <div className="flex items-center justify-between mb-6">
+      <BackButton/>
       <div></div>
       <div className="flex items-center gap-4">
         <div className="text-sm text-slate-300">{user?.name || user?.email}</div>
