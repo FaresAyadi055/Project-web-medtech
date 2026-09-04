@@ -2,16 +2,15 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>UniTasks</title>
   <script>
-    // GitHub Pages SPA redirect: rewrite URL path to index.html
-    var pathSegmentsToKeep = 0;
+    var segments = window.location.pathname.split('/').filter(Boolean);
+    var keep = segments.length ? 1 : 0;
     var l = window.location;
     l.replace(
       l.protocol + '//' + l.hostname + (l.port ? ':' + l.port : '') +
-      l.pathname.split('/').slice(0, 1 + pathSegmentsToKeep).join('/') + '/?/' +
-      l.pathname.slice(1).split('/').slice(pathSegmentsToKeep).join('/').replace(/&/g, '~and~') +
+      l.pathname.split('/').slice(0, 1 + keep).join('/') + '/?/' +
+      l.pathname.slice(1).split('/').slice(keep).join('/').replace(/&/g, '~and~') +
       (l.search ? '&' + l.search.slice(1).replace(/&/g, '~and~') : '') +
       l.hash
     );
