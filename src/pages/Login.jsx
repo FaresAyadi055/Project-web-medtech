@@ -39,6 +39,7 @@ export default function Login() {
           name: resp.data.user.name,
           role: resp.data.user.role
         }))
+        api.setCurrentUser({ uid: resp.data.user.id })
         setUser({ uid: resp.data.user.id, ...resp.data.user })
         navigate('/')
       }

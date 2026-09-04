@@ -1,0 +1,290 @@
+{
+  "users": [
+    {
+      "_id": "600000000000000000000001",
+      "name": "Admin User",
+      "email": "admin@local",
+      "password": "password123",
+      "role": "admin",
+      "classes": ["600000000000000000000020", "600000000000000000000021", "600000000000000000000022"]
+    },
+    {
+      "_id": "600000000000000000000002",
+      "name": "Super Admin",
+      "email": "admin2@local",
+      "password": "password123",
+      "role": "admin",
+      "classes": []
+    },
+    {
+      "_id": "600000000000000000000003",
+      "name": "Prof Alice",
+      "email": "alice@local",
+      "password": "password123",
+      "role": "teacher",
+      "classes": ["600000000000000000000020"]
+    },
+    {
+      "_id": "600000000000000000000004",
+      "name": "Prof Martinez",
+      "email": "martinez@local",
+      "password": "password123",
+      "role": "teacher",
+      "classes": ["600000000000000000000021"]
+    },
+    {
+      "_id": "600000000000000000000005",
+      "name": "Dr. Chen",
+      "email": "chen@local",
+      "password": "password123",
+      "role": "teacher",
+      "classes": ["600000000000000000000022"]
+    },
+    {
+      "_id": "600000000000000000000006",
+      "name": "Student Bob",
+      "email": "bob@local",
+      "password": "password123",
+      "role": "student",
+      "classes": ["600000000000000000000020", "600000000000000000000022"]
+    },
+    {
+      "_id": "600000000000000000000007",
+      "name": "Emma Wilson",
+      "email": "emma@local",
+      "password": "password123",
+      "role": "student",
+      "classes": ["600000000000000000000020", "600000000000000000000021"]
+    },
+    {
+      "_id": "600000000000000000000008",
+      "name": "James Lee",
+      "email": "james@local",
+      "password": "password123",
+      "role": "student",
+      "classes": ["600000000000000000000021"]
+    },
+    {
+      "_id": "600000000000000000000009",
+      "name": "Sofia Garcia",
+      "email": "sofia@local",
+      "password": "password123",
+      "role": "student",
+      "classes": ["600000000000000000000022"]
+    },
+    {
+      "_id": "600000000000000000000010",
+      "name": "Liam Brown",
+      "email": "liam@local",
+      "password": "password123",
+      "role": "student",
+      "classes": ["600000000000000000000020"]
+    },
+    {
+      "_id": "600000000000000000000011",
+      "name": "Olivia Davis",
+      "email": "olivia@local",
+      "password": "password123",
+      "role": "student",
+      "classes": ["600000000000000000000020", "600000000000000000000021", "600000000000000000000022"]
+    }
+  ],
+  "classes": [
+    {
+      "_id": "600000000000000000000020",
+      "name": "CS101 - Introduction to Programming",
+      "teacher": "600000000000000000000003",
+      "students": ["600000000000000000000006", "600000000000000000000007", "600000000000000000000010", "600000000000000000000011"],
+      "tasks": ["600000000000000000000030", "600000000000000000000031", "600000000000000000000032"]
+    },
+    {
+      "_id": "600000000000000000000021",
+      "name": "MATH201 - Calculus I",
+      "teacher": "600000000000000000000004",
+      "students": ["600000000000000000000007", "600000000000000000000008", "600000000000000000000011"],
+      "tasks": ["600000000000000000000033", "600000000000000000000034"]
+    },
+    {
+      "_id": "600000000000000000000022",
+      "name": "ENG101 - Academic Writing",
+      "teacher": "600000000000000000000005",
+      "students": ["600000000000000000000006", "600000000000000000000009", "600000000000000000000011"],
+      "tasks": ["600000000000000000000035", "600000000000000000000036"]
+    }
+  ],
+  "tasks": [
+    {
+      "_id": "600000000000000000000030",
+      "title": "Hello World Program",
+      "description": "Write your first program that prints 'Hello, World!' to the console. Use any programming language of your choice.",
+      "class": "600000000000000000000020",
+      "createdBy": "600000000000000000000003",
+      "attachments": [],
+      "comments": [
+        {
+          "author": "600000000000000000000003",
+          "content": "Make sure to include proper indentation in your code!",
+          "createdAt": "2026-08-20T10:00:00Z"
+        },
+        {
+          "author": "600000000000000000000006",
+          "content": "Can we use Python for this assignment?",
+          "createdAt": "2026-08-20T14:30:00Z"
+        }
+      ],
+      "createdAt": "2026-08-18T09:00:00Z"
+    },
+    {
+      "_id": "600000000000000000000031",
+      "title": "Variables and Data Types",
+      "description": "Create a program that declares variables of different data types (string, integer, float, boolean) and prints their values and types.",
+      "class": "600000000000000000000020",
+      "createdBy": "600000000000000000000003",
+      "attachments": [],
+      "comments": [],
+      "createdAt": "2026-08-25T09:00:00Z"
+    },
+    {
+      "_id": "600000000000000000000032",
+      "title": "Control Flow Project",
+      "description": "Build a simple calculator program that uses if-else statements and loops to perform basic arithmetic operations (add, subtract, multiply, divide).",
+      "class": "600000000000000000000020",
+      "createdBy": "600000000000000000000003",
+      "attachments": [],
+      "comments": [
+        {
+          "author": "600000000000000000000003",
+          "content": "Remember to handle division by zero!",
+          "createdAt": "2026-09-01T11:00:00Z"
+        }
+      ],
+      "createdAt": "2026-09-01T09:00:00Z"
+    },
+    {
+      "_id": "600000000000000000000033",
+      "title": "Limit Calculations",
+      "description": "Solve the following limit problems using epsilon-delta definitions. Show all your work and provide formal proofs.",
+      "class": "600000000000000000000021",
+      "createdBy": "600000000000000000000004",
+      "attachments": [],
+      "comments": [],
+      "createdAt": "2026-08-22T09:00:00Z"
+    },
+    {
+      "_id": "600000000000000000000034",
+      "title": "Derivatives Problem Set",
+      "description": "Calculate the derivatives of the following functions. Apply the power rule, chain rule, and product rule where appropriate.",
+      "class": "600000000000000000000021",
+      "createdBy": "600000000000000000000004",
+      "attachments": [],
+      "comments": [
+        {
+          "author": "600000000000000000000004",
+          "content": "Office hours are available on Thursday for questions.",
+          "createdAt": "2026-08-28T15:00:00Z"
+        }
+      ],
+      "createdAt": "2026-08-28T09:00:00Z"
+    },
+    {
+      "_id": "600000000000000000000035",
+      "title": "Argumentative Essay",
+      "description": "Write a 1500-word argumentative essay on a current technology ethics topic. Include at least 5 scholarly sources and a works cited page.",
+      "class": "600000000000000000000022",
+      "createdBy": "600000000000000000000005",
+      "attachments": [],
+      "comments": [
+        {
+          "author": "600000000000000000000005",
+          "content": "Remember to use APA format for citations.",
+          "createdAt": "2026-08-24T13:00:00Z"
+        }
+      ],
+      "createdAt": "2026-08-24T09:00:00Z"
+    },
+    {
+      "_id": "600000000000000000000036",
+      "title": "Research Paper Proposal",
+      "description": "Submit a 500-word research paper proposal including your thesis statement, methodology, and preliminary bibliography.",
+      "class": "600000000000000000000022",
+      "createdBy": "600000000000000000000005",
+      "attachments": [],
+      "comments": [],
+      "createdAt": "2026-09-02T09:00:00Z"
+    }
+  ],
+  "submissions": [
+    {
+      "_id": "600000000000000000000040",
+      "task": "600000000000000000000030",
+      "student": "600000000000000000000006",
+      "content": "print('Hello, World!') - Python solution",
+      "attachments": [],
+      "status": "approved",
+      "grade": 95,
+      "feedback": "Excellent work! Clean and concise.",
+      "gradedBy": "600000000000000000000003",
+      "submittedAt": "2026-08-22T18:30:00Z"
+    },
+    {
+      "_id": "600000000000000000000041",
+      "task": "600000000000000000000030",
+      "student": "600000000000000000000007",
+      "content": "console.log('Hello, World!'); - JavaScript solution",
+      "attachments": [],
+      "status": "approved",
+      "grade": 88,
+      "feedback": "Good job! Consider adding comments to your code.",
+      "gradedBy": "600000000000000000000003",
+      "submittedAt": "2026-08-23T10:15:00Z"
+    },
+    {
+      "_id": "600000000000000000000042",
+      "task": "600000000000000000000031",
+      "student": "600000000000000000000006",
+      "content": "Python variables with type() function demonstrations",
+      "attachments": [],
+      "status": "pending",
+      "grade": null,
+      "feedback": null,
+      "gradedBy": null,
+      "submittedAt": "2026-08-29T14:00:00Z"
+    },
+    {
+      "_id": "600000000000000000000043",
+      "task": "600000000000000000000033",
+      "student": "600000000000000000000007",
+      "content": "Epsilon-delta proofs for limits at infinity",
+      "attachments": [],
+      "status": "approved",
+      "grade": 92,
+      "feedback": "Very thorough proofs. Great understanding of the concept.",
+      "gradedBy": "600000000000000000000004",
+      "submittedAt": "2026-08-25T09:00:00Z"
+    },
+    {
+      "_id": "600000000000000000000044",
+      "task": "600000000000000000000035",
+      "student": "600000000000000000000006",
+      "content": "Essay on AI Ethics in Healthcare - 1600 words with APA citations",
+      "attachments": [],
+      "status": "approved",
+      "grade": 85,
+      "feedback": "Strong argument. Could improve the conclusion section.",
+      "gradedBy": "600000000000000000000005",
+      "submittedAt": "2026-08-27T23:45:00Z"
+    },
+    {
+      "_id": "600000000000000000000045",
+      "task": "600000000000000000000035",
+      "student": "600000000000000000000009",
+      "content": "Essay on Privacy Rights in the Digital Age",
+      "attachments": [],
+      "status": "rejected",
+      "grade": null,
+      "feedback": "Missing scholarly sources. Please resubmit with at least 5 references.",
+      "gradedBy": "600000000000000000000005",
+      "submittedAt": "2026-08-26T20:30:00Z"
+    }
+  ]
+}

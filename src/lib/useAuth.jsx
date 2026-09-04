@@ -8,36 +8,20 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    // Load persisted session from localStorage
     try {
       const stored = localStorage.getItem('uni_tasks_auth_user')
-      const token = localStorage.getItem('uni_tasks_token')
-      
-      if (stored && token) {
+      if (stored) {
         const parsed = JSON.parse(stored)
-        // Verify token is still valid by calling /me endpoint
-        api.get('/auth/me').then(resp => {
-          setUser({ uid: parsed.uid, ...resp.data.user })
-          setLoading(false)
-        }).catch(() => {
-          // Token expired or invalid
-          localStorage.removeItem('uni_tasks_auth_user')
-          localStorage.removeItem('uni_tasks_token')
-          setUser(null)
-          setLoading(false)
-        })
-      } else {
-        setUser(null)
-        setLoading(false)
+        api.setCurrentUser({ uid: parsed.uid })
+        setUser({ uid: parsed.uid, ...parsed })
       }
-    } catch (e) {
-      setUser(null)
-      setLoading(false)
-    }
+    } catch (e) {}
+    setLoading(false)
   }, [])
 
   const signOut = () => {
     setUser(null)
+    api.setCurrentUser(null)
     try {
       localStorage.removeItem('uni_tasks_auth_user')
       localStorage.removeItem('uni_tasks_token')
