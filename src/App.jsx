@@ -1,7 +1,6 @@
 import React from 'react'
 import { Routes, Route, Navigate } from 'react-router-dom'
 import Login from './pages/Login'
-import Register from './pages/Register'
 import AdminDashboard from './pages/AdminDashboard'
 import ManageUsers from './pages/ManageUsers'
 import TeacherDashboard from './pages/TeacherDashboard'
@@ -34,7 +33,6 @@ export default function App() {
     <>
       <Routes>
         <Route path="/login" element={!user ? <Login /> : <Navigate to="/" replace />} />
-        <Route path="/register" element={!user ? <Register /> : <Navigate to="/" replace />} />
 
         {/* Role-based dashboards */}
         <Route path="/" element={

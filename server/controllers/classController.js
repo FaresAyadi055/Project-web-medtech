@@ -1,63 +1,70 @@
-import ClassModel from '../models/Class.js'
-import User from '../models/User.js'
+import store from '../store.js'
 
 export async function createClass(req, res) {
   const { name, teacher } = req.body
-  const c = new ClassModel({ name, teacher })
-  await c.save()
-  // attach to teacher
+  const c = store.createOne('classes', { name, teacher: teacher || null, students: [], tasks: [] })
   if (teacher) {
-    await User.findByIdAndUpdate(teacher, { $addToSet: { classes: c._id } })
+    store.updateById('users', teacher, { $addToSet: { classes: c._id } })
   }
   res.json(c)
 }
 
 export async function listClasses(req, res) {
-  const classes = await ClassModel.find().populate('teacher', 'name email').populate('students', 'name email')
+  const classes = store.findAll('classes').map(c => {
+    const teacher = c.teacher ? store.findById('users', c.teacher) : null
+    const students = (c.students || []).map(sid => store.findById('users', sid)).filter(Boolean).map(({ password, ...u }) => u)
+    return { ...c, teacher: teacher ? { _id: teacher._id, name: teacher.name, email: teacher.email } : null, students }
+  })
   res.json(classes)
 }
 
 export async function getClass(req, res) {
-  const c = await ClassModel.findById(req.params.id).populate('teacher', 'name email').populate('students', 'name email')
+  const c = store.findById('classes', req.params.id)
   if (!c) return res.status(404).json({ message: 'Not found' })
-  res.json(c)
+  const teacher = c.teacher ? store.findById('users', c.teacher) : null
+  const students = (c.students || []).map(sid => store.findById('users', sid)).filter(Boolean).map(({ password, ...u }) => u)
+  res.json({ ...c, teacher: teacher ? { _id: teacher._id, name: teacher.name, email: teacher.email } : null, students })
 }
 
 export async function enrollStudent(req, res) {
   const { studentId } = req.body
-  const c = await ClassModel.findByIdAndUpdate(req.params.id, { $addToSet: { students: studentId } }, { new: true })
-  await User.findByIdAndUpdate(studentId, { $addToSet: { classes: c._id } })
+  store.updateById('classes', req.params.id, { $addToSet: { students: studentId } })
+  store.updateById('users', studentId, { $addToSet: { classes: req.params.id } })
+  const c = store.findById('classes', req.params.id)
   res.json(c)
 }
 
 export async function removeStudent(req, res) {
   const { studentId } = req.body
-  const c = await ClassModel.findByIdAndUpdate(req.params.id, { $pull: { students: studentId } }, { new: true })
-  await User.findByIdAndUpdate(studentId, { $pull: { classes: c._id } })
+  store.updateById('classes', req.params.id, { $pull: { students: studentId } })
+  store.updateById('users', studentId, { $pull: { classes: req.params.id } })
+  const c = store.findById('classes', req.params.id)
   res.json(c)
 }
 
 export async function enrollSelf(req, res) {
   const studentId = req.userId
-  const c = await ClassModel.findByIdAndUpdate(req.params.id, { $addToSet: { students: studentId } }, { new: true })
-  await User.findByIdAndUpdate(studentId, { $addToSet: { classes: c._id } })
+  store.updateById('classes', req.params.id, { $addToSet: { students: studentId } })
+  store.updateById('users', studentId, { $addToSet: { classes: req.params.id } })
+  const c = store.findById('classes', req.params.id)
   res.json(c)
 }
 
 export async function assignTeacher(req, res) {
   const { teacherId } = req.body
-  const c = await ClassModel.findByIdAndUpdate(req.params.id, { teacher: teacherId }, { new: true })
-  // Optionally update teacher's classes
-  await User.findByIdAndUpdate(teacherId, { $addToSet: { classes: c._id } })
+  store.updateById('classes', req.params.id, { teacher: teacherId })
+  store.updateById('users', teacherId, { $addToSet: { classes: req.params.id } })
+  const c = store.findById('classes', req.params.id)
   res.json(c)
 }
 
 export async function removeTeacher(req, res) {
-  const c = await ClassModel.findByIdAndUpdate(req.params.id, { teacher: null }, { new: true })
+  store.updateById('classes', req.params.id, { teacher: null })
+  const c = store.findById('classes', req.params.id)
   res.json(c)
 }
 
 export async function deleteClass(req, res) {
-  await ClassModel.findByIdAndDelete(req.params.id)
+  store.deleteById('classes', req.params.id)
   res.json({ message: 'deleted' })
 }

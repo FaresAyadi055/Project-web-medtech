@@ -7,9 +7,12 @@
     "dev": "vite",
     "server:start": "node server/app.js",
     "server:seed": "node server/seed.js",
+    "demo": "node server/app.js",
+    "demo:client": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "lint": "eslint . --ext .js,.jsx,.ts,.tsx || true"
+    "lint": "eslint . --ext .js,.jsx,.ts,.tsx || true",
+    "start": "node server/app.js"
   },
   "dependencies": {
     "axios": "^1.4.0",

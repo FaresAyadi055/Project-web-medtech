@@ -1,25 +1,27 @@
-import User from '../models/User.js'
+import store from '../store.js'
 
 export async function listUsers(req, res) {
-  const users = await User.find().select('-password')
+  const users = store.findAll('users').map(({ password, ...u }) => u)
   res.json(users)
 }
 
 export async function getUser(req, res) {
-  const u = await User.findById(req.params.id).select('-password')
+  const u = store.findById('users', req.params.id)
   if (!u) return res.status(404).json({ message: 'Not found' })
-  res.json(u)
+  const { password, ...safe } = u
+  res.json(safe)
 }
 
 export async function updateUser(req, res) {
-  const patch = req.body
-  if (patch.password) delete patch.password // handle password separately
-  const u = await User.findByIdAndUpdate(req.params.id, patch, { new: true }).select('-password')
+  const patch = { ...req.body }
+  delete patch.password
+  const u = store.updateById('users', req.params.id, patch)
   if (!u) return res.status(404).json({ message: 'Not found' })
-  res.json(u)
+  const { password, ...safe } = u
+  res.json(safe)
 }
 
 export async function deleteUser(req, res) {
-  await User.findByIdAndDelete(req.params.id)
+  store.deleteById('users', req.params.id)
   res.json({ message: 'deleted' })
 }

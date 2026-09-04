@@ -64,7 +64,7 @@ export default function Sidebar(){
       </nav>
 
       <div className="mt-6 text-xs text-slate-500">
-        <p>Version 1.0</p>
+        <p>Demo Mode v1.0</p>
         <p>School Task Manager</p>
       </div>
     </aside>
