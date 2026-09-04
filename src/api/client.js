@@ -2,9 +2,11 @@ let db = null
 let currentUser = null
 let token = null
 
+const BASE = import.meta.env.BASE_URL || '/'
+
 async function loadDB() {
   if (db) return db
-  const resp = await fetch('/seed-data.json')
+  const resp = await fetch(BASE + 'seed-data.json')
   const data = await resp.json()
   db = {
     users: data.users || [],
@@ -167,7 +169,7 @@ const api = {
       const user = findOne('users', { email })
       if (!user) throw { response: { data: { message: 'Invalid credentials' } } }
       // In demo mode, accept the stored plaintext password from seed data
-      const seedResp = await fetch('/seed-data.json')
+      const seedResp = await fetch(BASE + 'seed-data.json')
       const seedData = await seedResp.json()
       const seedUser = seedData.users.find(u => u.email === email)
       if (!seedUser || seedUser.password !== password) {
