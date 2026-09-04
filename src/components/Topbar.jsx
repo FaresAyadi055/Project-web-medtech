@@ -1,10 +1,12 @@
 import React from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../lib/useAuth'
 import FooterLogo from './FooterLogo'
 import BackButton from '../components/BackButton'
 
 export default function Topbar(){
   const { user, setUser } = useAuth()
+  const navigate = useNavigate()
 
   const { signOut } = useAuth()
 
@@ -16,7 +18,7 @@ export default function Topbar(){
       // eslint-disable-next-line no-console
       console.warn('Sign out failed:', e)
     } finally {
-      window.location.href = '/login'
+      navigate('/login')
     }
   }
 
